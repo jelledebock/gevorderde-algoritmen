@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     cout<<"# knopen: "<<boom.getAantalKnopen()<<endl;
     cout<<"Som diepte: "<<boom.getSomDiepte()<<endl;
     cout<<"Gemiddelde diepte: "<<boom.getGemiddeldeDiepte()<<endl;
-    boom.roteer(false);
+    boom.roteer(true);
     cout<<"Na rotatie naar links: "<<endl;
     cout<<boom;
     return 0;

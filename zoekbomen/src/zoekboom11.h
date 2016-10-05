@@ -66,39 +66,41 @@ class Zoekboom : public unique_ptr<Zoekknoop<Sleutel,Data>>{
         return this->get()->aantalKnopen();
     };
     void roteer(bool links){
-        Zoekknoop<Sleutel,Data>* neer = this->get();
-         Zoekknoop<Sleutel, Data>* op;
-        //=====roteer naar links==========
-        if(links){
-            op = this->get()->rechts.get();
-            
-            if(neer->links.get()){
-                neer->links.swap(op->links);
-            }
-            if(op->links.get()){
-                Zoekknoop<Sleutel,Data>* kind = op->links.get();
-                if(kind->links.get()){
-                    kind->links.swap(this->get()->rechts);
-                }
-            }
-            if(op->rechts.get()){
-                this->swap(op->rechts);
-            }
-            this->swap(op->links);       
-        }
-        //=====roteer naar rechts=========
-        else{
-            op = this->get()->links.get();
-            
-            if(neer->rechts){
-                op->rechts.swap(neer->rechts);
-            }
-            neer->links.swap(op->rechts);
-            if(op->links){
-                this->swap(op->links);
-            }
-            this->swap(op->rechts);
-        }
+        Zoekboom<Sleutel, Data> boom;
+	
+	//als je naar links moet roteren
+	if(links){
+		/*In a binary search tree, a left rotation is the movement of a node, X, down to the left. This rotation assumes that X has a right child (or subtree). 
+		X's right child, R, becomes X's parent node and R's left child becomes X's new right child. 
+		This rotation is done to balance the tree; specifically when the right subtree of node X has a significantly (depends on the type of tree) greather height than its left subtree.*/
+		
+		boom = move((*this)->rechts); //zet rechterkind in placeholder
+		(*this)->rechts = move(boom->links); //linkerkind wordt het rechterkind van onze huidige knoop, maar ouder moet nog worden juistgezet
+		
+		if((*this)->rechts !=nullptr){
+			(*this)->rechts->ouder = (*this).get(); // als je een rechterdeelboom hebt wordt zijn ouder onze huidige knoop
+		}
+		
+		boom->ouder = (*this)->ouder; //De ouder van de placeholder wordt de ouder van onze huidige knoop
+		(*this)->ouder = (*this)->links->ouder; //ouder van onze huidige knoop wordt de ouder van de linkerdeelboom
+		
+		boom->links = move(*this); //zet de huidige knoop in de linkerdeelboom van de placeholder
+		boom->links->ouder = boom.get(); //de ouder van de linkerdeelboom is de placeholder
+		
+	}else {
+		//Zie links voor uitleg, maar hier gaan we omgekeerd tewerk
+                boom = move((*this)->links);
+                (*this)->links = move(boom->rechts);
+                if ((*this)->links != nullptr)
+                    (*this)->links->ouder = (*this).get();
+
+                boom->ouder = (*this)->ouder;
+
+                boom->rechts = move(*this);
+                boom->rechts->ouder = boom.get();
+    }
+    
+    *this = move(boom);
     };
     Zoekboom<Sleutel,Data>& operator=(Zoekboom<Sleutel,Data>&& other){
         if(this != &other){
