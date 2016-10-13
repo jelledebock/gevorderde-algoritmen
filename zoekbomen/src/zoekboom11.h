@@ -11,7 +11,8 @@
 #include <iostream>
 #include <queue>
 #include <memory>
-
+#include <stack>
+#include <cmath>
 using namespace std;
 
 /**********************************************************************
@@ -82,7 +83,7 @@ class Zoekboom : public unique_ptr<Zoekknoop<Sleutel,Data>>{
 		}
 		
 		boom->ouder = (*this)->ouder; //De ouder van de placeholder wordt de ouder van onze huidige knoop
-		(*this)->ouder = (*this)->links->ouder; //ouder van onze huidige knoop wordt de ouder van de linkerdeelboom
+		(*this)->ouder = (*this)->links->ouder; //ouder van onze huidige knoop wordt de ouder van de linkerdeelboom (niet zeker of dit niet overbodig is)
 		
 		boom->links = move(*this); //zet de huidige knoop in de linkerdeelboom van de placeholder
 		boom->links->ouder = boom.get(); //de ouder van de linkerdeelboom is de placeholder
@@ -107,6 +108,20 @@ class Zoekboom : public unique_ptr<Zoekknoop<Sleutel,Data>>{
             this->reset(other.release());
         }
     }
+    
+    double potentiaal() {
+	stack<Zoekboom<Sleutel, Data>*> toVisit;
+	toVisit.push(this);
+	double pot = 0;
+	Zoekboom<Sleutel, Data> *cur;
+	while(!toVisit.empty()) {
+		cur = toVisit.top(); toVisit.pop();
+		if((*cur)->links.get()) toVisit.push(&((*cur)->links));
+		if((*cur)->rechts.get()) toVisit.push(&((*cur)->rechts));
+		pot += log2(cur->getSomDiepte());
+	}
+	return pot;
+    };
     protected:
     //zoekfunctie zoekt sl en geeft de boom in waaronder de sleutel zit (eventueel een lege boom als de sleutel
     //ontbreekt) en de pointer naar de ouder (als die bestaat, anders nulpointer).
@@ -198,6 +213,25 @@ class Zoekknoop {
             return 1+aantalLinks()+aantalRechts();
         }
         
+        Zoekknoop<Sleutel, Data> getOuder(){
+            return this->ouder;
+        }
+        
+        Zoekboom<Sleutel, Data>* Links(){
+            return &(links);
+        }
+        
+        Zoekboom<Sleutel, Data>* Rechts(){
+            return &(rechts);
+        }
+        
+        const Sleutel& getSleutel(){
+            return this->sleutel;
+        }
+        
+        Data* getData(){
+            return &(this->data);
+        }
     };
 
     template <class Sleutel,class Data>
