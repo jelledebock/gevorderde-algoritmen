@@ -128,7 +128,7 @@ void BruggenManager::optimaliseer_smeergeld(){
     }
     
     // Handig om te debuggen : print de DP array uit 
-      
+    /*  
     string voorgangers_array="";
     string bedragen_array = "";
     
@@ -152,7 +152,7 @@ void BruggenManager::optimaliseer_smeergeld(){
     
     cout<<"Voorgangers array..."<<endl<<voorgangers_array<<endl;
     cout<<"Bedragen...."<<endl<<bedragen_array;
-        
+    */    
     //We starten rechts onder en willen naar links boven, en telkens we diagonaal moeten springen voegen we ons winkelcentrum toe aan de opgenomen bedragen
     int i=max_bruggen;
     int j=max_bruggen;
@@ -187,8 +187,10 @@ void BruggenManager::optimaliseer_smeergeld(){
 Brug BruggenManager::zoek_brug(int index){
     int i=0;
     while(i<voorstellen.size()){
-        if(voorstellen[i].getWinkel()==index)
+        if(voorstellen[i].getWinkel()==index){
+            cout<<"Arena "<<voorstellen[i].getArena()<<" : "<<voorstellen[i].getWinkel()<<" voor "<<voorstellen[i].getPremie()<<endl;
             return voorstellen[i];
+        }
         i++;
     }
 }
